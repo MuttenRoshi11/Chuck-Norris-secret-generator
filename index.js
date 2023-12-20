@@ -31,7 +31,7 @@ app.get("/random", async (req, res) => {
     try {
         const result = await axios.get(API_URL, config);
         const response = result.data;
-        res.render("index", {secret: response.value, icon: response.icon_url});
+        res.render("index.ejs", {secret: response.value, icon: response.icon_url});
     } catch (error) {
         console.error(error);
         res.status(500).send("Internal Server Error");
