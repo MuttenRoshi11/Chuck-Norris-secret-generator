@@ -1,34 +1,43 @@
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
 
-// Creating app object with express as well as API URL and config object with API key
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 const port = 3000;
-const API_URL = "https://matchilling-chuck-norris-jokes-v1.p.rapidapi.com/jokes/random"
-const config = { 
+const API_URL = "https://matchilling-chuck-norris-jokes-v1.p.rapidapi.com/jokes/random";
+const config = {
     headers: {
-    accept: 'application/json',
-    'X-RapidAPI-Key': '68b87ad03fmsh6ef4e0597ce7701p12fbb4jsncc5c1346b6f7',
-}};
+        accept: 'application/json',
+        'X-RapidAPI-Key': '68b87ad03fmsh6ef4e0597ce7701p12fbb4jsncc5c1346b6f7',
+    },
+};
+
+// Set EJS as the view engine
+app.set("view engine", "ejs");
 
 app.use(express.static('public'));
-
 app.use(bodyParser.urlencoded({extended: true}));
 
-// Creating GET request to render homepage and axios GET request to generate random Chuck Norris secret
 app.get("/", (req, res) => {
-
-    res.sendFile("c:/Users/Armin/Desktop/Training/Web Dev training/BackEnd/Chuck Norris API/index.html");
+    res.sendFile(__dirname + "/index.html");
 });
 
 app.get("/random", async (req, res) => {
-    const result = await axios.get(API_URL, config);
-    const response = result.data;
-    res.render("index.ejs", {secret: response.value, icon: response.icon_url});
+    try {
+        const result = await axios.get(API_URL, config);
+        const response = result.data;
+        res.render("index", {secret: response.value, icon: response.icon_url});
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
-// Created listening port
 app.listen(port, () => {
     console.log("Listening on port " + port);
 });
